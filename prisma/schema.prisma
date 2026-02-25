@@ -1,14 +1,325 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+//schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// =========================================================
+// 1. CONFIGURATION
+// =========================================================
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
+}
+
+// =========================================================
+// 2. ENUMS (The Rules)
+// =========================================================
+
+enum UserRole {
+  ADMIN       
+  TEACHER     
+  STUDENT     
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE        // Can carry partial points (e.g., 0.5)
+  ON_DUTY     // "OD" - Hackathons/Sports (Counts as Present)
+  EXCUSED     // Medical (Reduces the denominator)
+}
+
+enum SessionStatus {
+  SCHEDULED   
+  ACTIVE      
+  COMPLETED   
+  CANCELLED   
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum SessionType {
+  LECTURE     // Default: 1 Point
+  LAB         // Default: 2 or 3 Points
+  TUTORIAL    // Default: 1 Point
+}
+
+// =========================================================
+// 3. USER MANAGEMENT & AUTH
+// =========================================================
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String
+  role           UserRole  @default(STUDENT)
+  avatar         String?   
+  
+  // NextAuth & Credentials specific fields
+  emailVerified  DateTime?
+  hashedPassword String?   // Optional because OAuth users wouldn't have one
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // NextAuth Relations
+  accounts       Account[]
+  sessions       Session[]
+
+  // Domain Relations
+  studentProfile StudentProfile?
+  teacherProfile TeacherProfile?
+  pushSubscriptions PushSubscription[]
+}
+
+// --- NEXTAUTH STANDARD MODELS ---
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- CUSTOM AUTH MODELS (Password Reset Flow) ---
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([email, token])
+}
+
+// =========================================================
+// 4. ACADEMIC STRUCTURE (The Hierarchy)
+// =========================================================
+
+model StudentProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  rollNumber    String   // e.g., "CSE/2023/045"
+  currentSemester Int      @default(1) 
+  
+  classId       String
+  class         Class    @relation("ClassStudents", fields: [classId], references: [id])
+  
+  enrolledSubjects Subject[] @relation("StudentEnrollments")
+  managedClass  Class?   @relation("ClassCR") 
+
+  attendanceRecords AttendanceRecord[]
+  attendanceSummaries AttendanceSummary[]
+}
+
+model TeacherProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  designation   String?  
+  isHod         Boolean  @default(false)
+  
+  coordinatedClass Class?  @relation("ClassCoordinator")
+
+  subjects      Subject[] 
+  classes       Class[]   
+  sessions      AttendanceSession[]
+  timeSlots     TimeSlot[] 
+}
+
+model Class {
+  id            String   @id @default(cuid())
+  name          String   // e.g., "B. Tech CSE - 3rd Year"
+  batch         String   // e.g., "2023-2027"
+  
+  coordinatorId String?  @unique
+  coordinator   TeacherProfile? @relation("ClassCoordinator", fields: [coordinatorId], references: [id])
+
+  crId          String?  @unique
+  cr            StudentProfile? @relation("ClassCR", fields: [crId], references: [id])
+
+  teachers      TeacherProfile[]
+
+  students      StudentProfile[] @relation("ClassStudents")
+  timeSlots     TimeSlot[]
+  sessions      AttendanceSession[]
+}
+
+model Subject {
+  id            String      @id @default(cuid())
+  name          String      // e.g., "DBMS Lab" or "DBMS Theory"
+  code          String      // e.g., "CSE351" or "CSE301"
+  
+  // Defines if this subject is fundamentally a Lab, Lecture, etc.
+  type          SessionType @default(LECTURE)
+  
+  defaultPoints Int         @default(1) 
+  
+  teachers      TeacherProfile[]
+  students      StudentProfile[] @relation("StudentEnrollments")
+  timeSlots     TimeSlot[]
+  sessions      AttendanceSession[]
+  attendanceSummaries AttendanceSummary[]
+}
+
+// =========================================================
+// 5. THE ROUTINE (Static Template)
+// =========================================================
+
+model TimeSlot {
+  id            String      @id @default(cuid())
+  day           DayOfWeek
+  startTime     String      // "11:00"
+  endTime       String      // "12:30"
+  type          SessionType @default(LECTURE) 
+  roomNumber    String?     
+  
+  classId       String
+  class         Class       @relation(fields: [classId], references: [id])
+  subjectId     String
+  subject       Subject     @relation(fields: [subjectId], references: [id])
+  teacherId     String?     
+  teacher       TeacherProfile? @relation(fields: [teacherId], references: [id]) 
+  
+  validFrom     DateTime    @default(now())
+  validUntil    DateTime?   
+  isActive      Boolean     @default(true) 
+  sessions      AttendanceSession[]
+
+  @@index([day, isActive]) 
+}
+
+// =========================================================
+// 6. THE DAILY ACTION & RECORDS
+// =========================================================
+
+model AttendanceSession {
+  id            String        @id @default(cuid())
+  date          DateTime      @default(now())
+  timeSlotId    String?       
+  timeSlot      TimeSlot?     @relation(fields: [timeSlotId], references: [id])
+  roomNumber    String?     
+
+  teacherId     String
+  teacher       TeacherProfile @relation(fields: [teacherId], references: [id])
+  classId       String
+  class         Class         @relation(fields: [classId], references: [id])
+  subjectId     String
+  subject       Subject       @relation(fields: [subjectId], references: [id])
+  
+  status        SessionStatus @default(SCHEDULED)
+  
+  // Captures the actual type of session being conducted (useful for extra classes)
+  sessionType   SessionType   @default(LECTURE)
+  
+  maxPoints     Int           @default(1) 
+  isExtraClass  Boolean       @default(false)
+  isMandatory   Boolean       @default(true) 
+  isDelegated   Boolean       @default(false)
+  expectedCount Int?          
+  markedCount   Int           @default(0)   
+  
+  records       AttendanceRecord[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([teacherId, date])
+}
+
+model AttendanceRecord {
+  id            String           @id @default(cuid())
+  sessionId     String
+  session       AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status        AttendanceStatus @default(ABSENT)
+  pointsEarned  Float            @default(0) 
+  remarks       String?          
+
+  @@unique([sessionId, studentId]) 
+}
+
+// =========================================================
+// 7. PERFORMANCE CACHING (The PWA Speed Secret)
+// =========================================================
+
+model AttendanceSummary {
+  id                    String         @id @default(cuid())
+  studentId             String
+  student               StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId             String
+  subject               Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  semester              Int            
+  
+  totalClassesConducted Int            @default(0) 
+  totalClassesAttended  Int            @default(0) 
+  totalPointsPossible   Float          @default(0) 
+  totalPointsEarned     Float          @default(0) 
+  updatedAt             DateTime       @updatedAt
+
+  @@unique([studentId, subjectId, semester])
+  @@index([studentId, semester]) 
+}
+
+// =========================================================
+// 8. EXTRAS & UTILITIES
+// =========================================================
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Holiday {
+  id         String   @id @default(cuid())
+  date       DateTime @unique 
+  name       String   
+  isOfficial Boolean  @default(true)
 }
