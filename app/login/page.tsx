@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { getSystemStatus, registerFirstAdmin } from "@/lib/actions/auth";
 
@@ -41,8 +41,13 @@ export default function LoginPage() {
       setError("Invalid email or password");
       setIsLoading(false);
     } else {
-      router.push("/");
-      router.refresh();
+      // Fetch the session to determine the user's role dynamically
+      const session = await getSession();
+      const userRole = session?.user?.role?.toLowerCase() || "student"; // defaults to student just in case
+
+      // Redirect to the role-based dashboard
+      router.push(`/${userRole}/dashboard`);
+      router.refresh(); // Force a refresh so layout fetches the new session state
     }
   };
 
@@ -63,13 +68,20 @@ export default function LoginPage() {
       setError(result.error);
       setIsLoading(false);
     } else {
-      // After registration, immediately log them in
-      await signIn("credentials", {
-        redirect: true,
-        callbackUrl: "/",
+      // After registration, silently log them in and push to Admin dashboard
+      const signInResult = await signIn("credentials", {
+        redirect: false,
         email,
         password,
       });
+
+      if (!signInResult?.error) {
+        router.push("/admin/dashboard");
+        router.refresh();
+      } else {
+        setError("Account created, but auto-login failed. Please log in.");
+        setIsLoading(false);
+      }
     }
   };
 

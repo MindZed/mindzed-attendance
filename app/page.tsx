@@ -11,11 +11,11 @@ export default async function Home() {
   if (session?.user) {
     switch (session.user.role) {
       case "ADMIN":
-        redirect("/admin");
+        redirect("/admin/dashboard");
       case "TEACHER":
-        redirect("/teacher");
+        redirect("/teacher/dashboard");
       case "STUDENT":
-        redirect("/student");
+        redirect("/student/dashboard");
       default:
         // Fallback just in case
         break;
