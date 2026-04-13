@@ -1,4 +1,8 @@
 // middleware.ts
+// This file implements edge-level security for the entire application using NextAuth.
+// It intercepts all incoming requests to protected routes (/admin, /teacher, /student)
+// before they reach the server, verifying the user's encrypted JWT and Role. Unauthorized 
+// access attempts are instantly redirected to the login page.
 
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";

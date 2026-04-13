@@ -1,3 +1,8 @@
+// app/users/teachers/page.tsx
+// This Server Component renders the Faculty Directory. It securely fetches teacher 
+// profiles from the database and displays them in a responsive grid card layout, 
+// dynamically highlighting Heads of Department (HODs) with a special badge.
+
 import { getTeachers } from "@/lib/actions/users";
 import { Building, Award } from "lucide-react";
 import { redirect } from "next/navigation";

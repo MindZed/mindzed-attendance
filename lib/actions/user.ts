@@ -1,4 +1,7 @@
 // lib/actions/user.ts
+// NOTE: This file appears to be an older iteration of the password update logic.
+// The active, FormData-based version is currently located in lib/actions/security.ts.
+// This Server Action handles authenticated password updates using direct string parameters.
 
 "use server";
 

@@ -1,5 +1,6 @@
-//schema
-
+// prisma/schema.prisma
+// This file defines the database structure, including the new Syllabus tracking 
+// models, custom coverage types (Revisions, Skipped, Extra), and Admin Snapshots.
 
 // =========================================================
 // 1. CONFIGURATION
@@ -51,6 +52,14 @@ enum SessionType {
   LECTURE     // Default: 1 Point
   LAB         // Default: 2 or 3 Points
   TUTORIAL    // Default: 1 Point
+}
+
+// NEW: To handle Souvik Sir's edge cases
+enum CoverageType {
+  FIRST_TIME  // Standard completion
+  REVISION    // Taught again by student demand
+  SKIPPED     // Teacher concluded module without teaching this
+  EXTRA       // Custom topic outside standard syllabus
 }
 
 // =========================================================
@@ -135,37 +144,37 @@ model PasswordResetToken {
 // =========================================================
 
 model StudentProfile {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  rollNumber    String   // e.g., "CSE/2023/045"
+  rollNumber      String   // e.g., "CSE/2023/045"
   currentSemester Int      @default(1) 
   
-  classId       String
-  class         Class    @relation("ClassStudents", fields: [classId], references: [id])
+  classId         String
+  class           Class    @relation("ClassStudents", fields: [classId], references: [id])
   
   enrolledSubjects Subject[] @relation("StudentEnrollments")
-  managedClass  Class?   @relation("ClassCR") 
+  managedClass    Class?   @relation("ClassCR") 
 
   attendanceRecords AttendanceRecord[]
   attendanceSummaries AttendanceSummary[]
 }
 
 model TeacherProfile {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  designation   String?  
-  isHod         Boolean  @default(false)
+  designation      String?  
+  isHod            Boolean  @default(false)
   
   coordinatedClass Class?  @relation("ClassCoordinator")
 
-  subjects      Subject[] 
-  classes       Class[]   
-  sessions      AttendanceSession[]
-  timeSlots     TimeSlot[] 
+  subjects         Subject[] 
+  classes          Class[]   
+  sessions         AttendanceSession[]
+  timeSlots        TimeSlot[] 
 }
 
 model Class {
@@ -184,6 +193,9 @@ model Class {
   students      StudentProfile[] @relation("ClassStudents")
   timeSlots     TimeSlot[]
   sessions      AttendanceSession[]
+  
+  // NEW: Relation for syllabus tracking
+  coveredTopics TopicCoverage[] @relation("ClassTopics")
 }
 
 model Subject {
@@ -201,6 +213,9 @@ model Subject {
   timeSlots     TimeSlot[]
   sessions      AttendanceSession[]
   attendanceSummaries AttendanceSummary[]
+  
+  // NEW: Relation to Syllabus Engine
+  modules       SyllabusModule[] @relation("SubjectModules")
 }
 
 // =========================================================
@@ -257,10 +272,13 @@ model AttendanceSession {
   isExtraClass  Boolean       @default(false)
   isMandatory   Boolean       @default(true) 
   isDelegated   Boolean       @default(false)
-  expectedCount Int?          
+  expectedCount Int?         
   markedCount   Int           @default(0)   
   
   records       AttendanceRecord[]
+  
+  // NEW: Link to topics covered during this specific session
+  coveredTopics TopicCoverage[] @relation("SessionTopics")
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -318,8 +336,79 @@ model PushSubscription {
 }
 
 model Holiday {
-  id         String   @id @default(cuid())
-  date       DateTime @unique 
-  name       String   
-  isOfficial Boolean  @default(true)
+  id          String   @id @default(cuid())
+  date        DateTime @unique 
+  name        String   
+  isOfficial  Boolean  @default(true)
+}
+
+// =========================================================
+// 9. ADMIN ANALYTICS & CACHE (UI-Optimized)
+// =========================================================
+
+model SystemDailySnapshot {
+  id                     String   @id @default(cuid())
+  date                   DateTime @unique // Stored at midnight UTC
+  
+  totalStudents          Int      @default(0) // The denominator (e.g., 603)
+  totalTeachers          Int      @default(0)
+
+  totalSessionsScheduled Int      @default(0) // The Denominator
+  sessionsCompleted      Int      @default(0) // The Numerator (Classes Conducted)
+  delegatedSessions      Int      @default(0) // Security anomaly tracking
+
+  studentsPresentToday   Int      @default(0) // Raw headcount (e.g., 562)
+  overallAttendanceRatio Float    @default(0) // Daily attendance ratio (e.g., 45%)
+
+  updatedAt              DateTime @updatedAt
+
+  @@index([date])
+}
+
+// =========================================================
+// 10. SYLLABUS & PROGRESS TRACKING (Souvik Sir's Request)
+// =========================================================
+
+model SyllabusModule {
+  id          String          @id @default(cuid())
+  subjectId   String
+  subject     Subject         @relation("SubjectModules", fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  name        String          // e.g., "Module 1: Database Architecture"
+  order       Int             // Used to sort modules correctly
+  isCompleted Boolean         @default(false) // If a teacher closes a module early
+  
+  topics      SyllabusTopic[]
+}
+
+model SyllabusTopic {
+  id          String          @id @default(cuid())
+  moduleId    String
+  module      SyllabusModule  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  name        String          // e.g., "3-Tier Architecture"
+  order       Int             // Used to sort topics within a module
+  isCustom    Boolean         @default(false) // True if added via "+ Add Custom Topic"
+  
+  coverages   TopicCoverage[]
+}
+
+model TopicCoverage {
+  id            String            @id @default(cuid())
+  
+  topicId       String
+  topic         SyllabusTopic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  
+  sessionId     String
+  session       AttendanceSession @relation("SessionTopics", fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  classId       String
+  class         Class             @relation("ClassTopics", fields: [classId], references: [id], onDelete: Cascade)
+
+  coverageType  CoverageType      @default(FIRST_TIME) // Handles Revisions, Skipped, Extra
+
+  createdAt     DateTime          @default(now())
+
+  // A class can only have one specific coverage status for a topic per session
+  @@unique([topicId, classId, sessionId]) 
 }

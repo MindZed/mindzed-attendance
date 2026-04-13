@@ -1,4 +1,8 @@
 // app/page.tsx
+// This file serves as the root entry point (/) for the application. 
+// It acts as a "Traffic Controller", securely checking the user's session 
+// and automatically redirecting them to their respective role-based dashboard 
+// (Admin, Teacher, or Student). If unauthenticated, it prompts them to log in.
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/route";

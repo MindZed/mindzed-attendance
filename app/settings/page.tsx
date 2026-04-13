@@ -1,5 +1,10 @@
+// app/settings/page.tsx
+// This file serves as the unified Settings dashboard for all users (Admins, Teachers, Students).
+// It acts as a Server Component, dynamically fetching the user's role and HOD status 
+// to render a tailored, minimalist navigation menu alongside global settings and dev tools.
+
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; ///route.ts]
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { UserRole } from "@prisma/client";
@@ -62,10 +67,11 @@ export default async function SettingsPage() {
     },
   ];
 
+  // Placeholder URLs for Dev Tools
   const devTools: SettingLink[] = [
     {
-      title: "Force  Update",
-      href: "/settings/profile",
+      title: "Force Update",
+      href: "/settings/profile", 
       icon: User,
     },
     {
@@ -74,7 +80,7 @@ export default async function SettingsPage() {
       icon: Shield,
     },
     {
-      title: "Maintance Mode",
+      title: "Maintenance Mode",
       href: "/settings/notifications",
       icon: Bell,
     },
@@ -132,17 +138,17 @@ export default async function SettingsPage() {
       },
       {
         title: "Class & Routine",
-        href: "/settings/manage-hods",
+        href: "/settings/manage-hods", // Placeholder
         icon: Building,
       },
       {
         title: "Subjects",
-        href: "/settings/manage-hods",
+        href: "/settings/manage-hods", // Placeholder
         icon: Building,
       },
       {
         title: "Holidays",
-        href: "/settings/manage-hods",
+        href: "/settings/manage-hods", // Placeholder
         icon: Building,
       },
     ];

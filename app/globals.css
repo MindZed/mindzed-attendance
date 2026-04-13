@@ -1,3 +1,7 @@
+/* app/globals.css */
+/* This file contains global CSS overrides and configures the base Tailwind CSS v4 theme. 
+   It sets up CSS variables for light/dark mode and defines the default font stacks. */
+
 @import "tailwindcss";
 
 :root {

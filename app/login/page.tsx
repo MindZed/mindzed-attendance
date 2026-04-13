@@ -1,4 +1,8 @@
 // app/login/page.tsx
+// This file handles authentication for the application. It includes a highly secure
+// "First-Run" detection system to bootstrap the initial Super Admin account without
+// manual database seeding. For existing users, it handles credential login and
+// dynamically routes them to their role-specific dashboards.
 
 "use client";
 
@@ -85,66 +89,83 @@ export default function LoginPage() {
     }
   };
 
-  if (isFirstRun === null) return <div>Loading System...</div>;
+  if (isFirstRun === null) return <div className="flex h-screen items-center justify-center">Loading System...</div>;
 
   return (
-    <main>
-      {isFirstRun ? (
-        <section>
-          <h1>Initial Admin Setup</h1>
-          <p>No users detected. Register the first Super Admin account.</p>
-          <form onSubmit={handleAdminSetup}>
-            <input 
-              placeholder="Full Name" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} 
-              required 
-            />
-            <input 
-              type="email" 
-              placeholder="Admin Email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              required 
-            />
-            <input 
-              type="password" 
-              placeholder="Password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
-            />
-            <button type="submit" disabled={isLoading}>
-              {isLoading ? "Creating..." : "Initialize System"}
-            </button>
-          </form>
-        </section>
-      ) : (
-        <section>
-          <h1>Log In</h1>
-          <form onSubmit={handleLogin}>
-            <input 
-              type="email" 
-              placeholder="Email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              required 
-            />
-            <input 
-              type="password" 
-              placeholder="Password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
-            />
-            <button type="submit" disabled={isLoading}>
-              {isLoading ? "Authenticating..." : "Auth In"}
-            </button>
-          </form>
-          <p>Forgot Password?</p>
-        </section>
-      )}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      {/* Qadir: This is the headless container. Replace these generic HTML tags with your custom Card, Input, and Button UI components! */}
+      <div className="w-full max-w-md bg-white rounded-xl shadow-md p-8">
+        
+        {isFirstRun ? (
+          <section>
+            <h1 className="text-2xl font-bold mb-2">Initial Admin Setup</h1>
+            <p className="text-sm text-gray-500 mb-6">No users detected. Register the first Super Admin account.</p>
+            <form onSubmit={handleAdminSetup} className="space-y-4">
+              <input 
+                className="w-full px-4 py-2 border rounded-lg"
+                placeholder="Full Name" 
+                value={name} 
+                onChange={(e) => setName(e.target.value)} 
+                required 
+              />
+              <input 
+                className="w-full px-4 py-2 border rounded-lg"
+                type="email" 
+                placeholder="Admin Email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required 
+              />
+              <input 
+                className="w-full px-4 py-2 border rounded-lg"
+                type="password" 
+                placeholder="Password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
+              />
+              <button 
+                type="submit" 
+                disabled={isLoading}
+                className="w-full bg-black text-white font-medium py-2 rounded-lg disabled:opacity-50"
+              >
+                {isLoading ? "Creating..." : "Initialize System"}
+              </button>
+            </form>
+          </section>
+        ) : (
+          <section>
+            <h1 className="text-2xl font-bold mb-6">Log In</h1>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <input 
+                className="w-full px-4 py-2 border rounded-lg"
+                type="email" 
+                placeholder="Email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required 
+              />
+              <input 
+                className="w-full px-4 py-2 border rounded-lg"
+                type="password" 
+                placeholder="Password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
+              />
+              <button 
+                type="submit" 
+                disabled={isLoading}
+                className="w-full bg-black text-white font-medium py-2 rounded-lg disabled:opacity-50"
+              >
+                {isLoading ? "Authenticating..." : "Auth In"}
+              </button>
+            </form>
+            <p className="text-sm text-blue-600 mt-4 cursor-pointer hover:underline text-center">Forgot Password?</p>
+          </section>
+        )}
+        {error && <p className="text-sm text-red-500 mt-4 text-center">{error}</p>}
+      </div>
     </main>
   );
 }

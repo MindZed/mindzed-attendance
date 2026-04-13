@@ -1,3 +1,9 @@
+// lib/actions/users.ts
+// This file is the central hub for securely fetching user directories from the database.
+// It implements strict Role-Based Access Control (RBAC) at the server level, ensuring
+// that Admins, HODs, Class Coordinators, and Students can only query and retrieve 
+// data that their specific roles and assignments permit them to see.
+
 "use server";
 
 import { getServerSession } from "next-auth";

@@ -1,4 +1,7 @@
 // components/auth/logout-button.tsx
+// This Client Component provides a simple, reusable logout button.
+// It uses NextAuth's signOut function to securely clear the user's session
+// and automatically redirects them back to the login page.
 
 "use client";
 

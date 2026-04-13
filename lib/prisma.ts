@@ -1,4 +1,9 @@
 // lib/prisma.ts
+// This file initializes the Prisma ORM client for the application.
+// It implements a singleton pattern using a global variable to prevent connection 
+// exhaustion during development hot-reloads. It also configures the PrismaPg adapter
+// with connection pooling to satisfy Prisma 7's edge-compatible connection requirements.
+
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";

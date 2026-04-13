@@ -1,4 +1,7 @@
 // lib/actions/auth.ts
+// This file contains Server Actions related to system initialization and authentication.
+// It provides the backend logic for the "First-Run" detection system, allowing
+// the secure creation of the initial Super Admin account without manual DB seeding.
 
 "use server";
 

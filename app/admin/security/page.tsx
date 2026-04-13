@@ -1,4 +1,6 @@
 // app/admin/security/page.tsx
+// This file provides the client-side UI for admins to update their account password.
+// It handles local form state, basic validation, and securely calls the updatePassword server action.
 
 "use client";
 

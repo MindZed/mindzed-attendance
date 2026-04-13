@@ -1,3 +1,9 @@
+// app/users/admins/page.tsx
+// This file is a Server Component that renders the directory of System Administrators.
+// It fetches data securely on the server via the getAdmins action and displays it 
+// in a responsive table. If a non-admin attempts to access this data, the server action 
+// returns an error, triggering an immediate redirect to protect user privacy.
+
 import { getAdmins } from "@/lib/actions/users";
 import { ShieldAlert } from "lucide-react";
 import { redirect } from "next/navigation";

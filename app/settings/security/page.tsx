@@ -1,3 +1,8 @@
+// app/settings/security/page.tsx
+// This file provides the unified, polished user interface for updating security settings.
+// It leverages modern React features (useTransition, FormData) to securely call the 
+// changePassword server action, providing responsive UI feedback and dark mode support.
+
 "use client";
 
 import { useState, useTransition } from "react";

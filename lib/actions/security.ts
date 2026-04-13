@@ -1,3 +1,8 @@
+// lib/actions/security.ts
+// This file contains Server Actions specifically for user security operations.
+// It handles authenticated password changes, ensuring the user's session is valid,
+// verifying their current credentials via bcrypt, and securely updating the database.
+
 "use server";
 
 import { getServerSession } from "next-auth";

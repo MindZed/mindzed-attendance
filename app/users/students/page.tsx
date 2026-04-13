@@ -1,3 +1,9 @@
+// app/users/students/page.tsx
+// This Server Component manages a two-tier view for browsing students. 
+// First, it displays a grid of classes/batches the user is permitted to view. 
+// Once a class is selected (via URL search parameters), it fetches and displays 
+// a detailed roster of students enrolled in that specific class.
+
 import { getPermittedClasses, getStudentsByClass } from "@/lib/actions/users";
 import { Users, GraduationCap, ArrowLeft } from "lucide-react";
 import Link from "next/link";

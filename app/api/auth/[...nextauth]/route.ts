@@ -1,4 +1,7 @@
 // app/api/auth/[...nextauth]/route.ts
+// This file configures NextAuth for the entire application.
+// It handles the Credentials login flow, verifies passwords against the Neon database using bcrypt,
+// and securely stores the user's ID and Role inside the encrypted JWT session token.
 
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -67,7 +70,7 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   pages: {
-    signIn: "/login", // This tells NextAuth to use our custom login page (which we will build next)
+    signIn: "/login", // This tells NextAuth to use our custom login page
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
