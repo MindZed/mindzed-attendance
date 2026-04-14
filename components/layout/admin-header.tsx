@@ -69,6 +69,13 @@ export default function AdminHeader() {
                             Manage Users
                         </Link>
                         <Link
+                            href="/admin/classes"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        >
+                            Manage Classes
+                        </Link>
+                        <Link
                             href="/admin/security"
                             onClick={() => setIsMenuOpen(false)}
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"

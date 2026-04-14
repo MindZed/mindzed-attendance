@@ -165,6 +165,7 @@ model TeacherProfile {
   id               String   @id @default(cuid())
   userId           String   @unique
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeId       String   @unique // e.g., "FAC-2024-001"
   
   designation      String?  
   isHod            Boolean  @default(false)
@@ -179,7 +180,8 @@ model TeacherProfile {
 
 model Class {
   id            String   @id @default(cuid())
-  name          String   // e.g., "B. Tech CSE - 3rd Year"
+  course        String   // e.g., B.Tech or MBA or B.Ed
+  name          String   // e.g., "CSE"
   batch         String   // e.g., "2023-2027"
   
   coordinatorId String?  @unique
