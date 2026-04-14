@@ -9,6 +9,8 @@ import {
   todayAgenda,
 } from "./mock-data";
 
+const CRITICAL_ATTENDANCE_THRESHOLD = 50;
+
 const statusMeta = {
   SCHEDULED: {
     icon: Clock3,
@@ -133,7 +135,9 @@ export function BaseTeacherView() {
       </section>
 
       <section className="border border-mz-text-primary/15 bg-mz-bg-primary p-4">
-        <h3 className="mb-4 text-base font-semibold tracking-tight">Critical Defaulters (&lt; 50%)</h3>
+        <h3 className="mb-4 text-base font-semibold tracking-tight">
+          Critical Defaulters (&lt; {CRITICAL_ATTENDANCE_THRESHOLD}%)
+        </h3>
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse text-sm">
             <thead>

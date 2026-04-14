@@ -8,6 +8,8 @@ import {
   type DashboardUser,
 } from "./mock-data";
 
+const CRITICAL_ATTENDANCE_THRESHOLD = 50;
+
 const healthTone = (value: number) => {
   if (value < 60) return "text-mz-danger";
   if (value < 75) return "text-mz-warning";
@@ -62,7 +64,9 @@ export function AdminView({ user }: { user: DashboardUser }) {
 
       <section className="border border-mz-dark-border bg-mz-dark-surface p-4">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h3 className="text-base font-semibold tracking-tight text-mz-dark-text">Macro Defaulters Radar (&lt; 50%)</h3>
+          <h3 className="text-base font-semibold tracking-tight text-mz-dark-text">
+            Macro Defaulters Radar (&lt; {CRITICAL_ATTENDANCE_THRESHOLD}%)
+          </h3>
           <div className="flex gap-2">
             <select
               value={batchFilter}
