@@ -4,18 +4,20 @@
 
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { Student, AttendanceStatus } from '../data/mock-students';
 import { Check, X, Clock, Undo2 } from 'lucide-react';
 
 interface AttendanceCardSliderProps {
   students: Student[];
   onMarkAttendance: (studentId: string, status: AttendanceStatus) => void;
+  onConfirmSummary?: () => void;
 }
 
 export function AttendanceCardSlider({
   students,
   onMarkAttendance,
+  onConfirmSummary,
 }: AttendanceCardSliderProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -23,10 +25,9 @@ export function AttendanceCardSlider({
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
   const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null);
-  const [lastMarkedIndex, setLastMarkedIndex] = useState<number | null>(null);
 
   const currentStudent = students[currentIndex];
-  const isLastCard = currentIndex === students.length - 1;
+  const isCompletionCard = currentIndex >= students.length;
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -77,14 +78,21 @@ export function AttendanceCardSlider({
     const diffX = currentX - startX;
     const threshold = 60; // minimum swipe distance
 
+    if (isCompletionCard) {
+      if (Math.abs(diffX) > threshold) {
+        onConfirmSummary?.();
+      }
+      setCurrentX(startX);
+      setDragDirection(null);
+      return;
+    }
+
     // Right swipe - Present
     if (diffX > threshold) {
-      setLastMarkedIndex(currentIndex);
       handleMarkAttendance('present');
     }
     // Left swipe - Absent
     else if (diffX < -threshold) {
-      setLastMarkedIndex(currentIndex);
       handleMarkAttendance('absent');
     }
 
@@ -93,23 +101,20 @@ export function AttendanceCardSlider({
   };
 
   const handleMarkAttendance = (status: AttendanceStatus) => {
+    if (!currentStudent) return;
     onMarkAttendance(currentStudent.id, status);
 
     // Move to next card
-    if (!isLastCard) {
-      setCurrentIndex(currentIndex + 1);
-    }
+    setCurrentIndex((prev) => Math.min(prev + 1, students.length));
   };
 
   const handleUndo = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
-      setLastMarkedIndex(null);
     }
   };
 
   const handleButtonClick = (status: AttendanceStatus) => {
-    setLastMarkedIndex(currentIndex);
     handleMarkAttendance(status);
   };
 
@@ -206,8 +211,31 @@ export function AttendanceCardSlider({
             </p>
           </div>
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-gray-500">No more students</p>
+          <div
+            ref={cardRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleEndDrag}
+            onMouseLeave={handleEndDrag}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleEndDrag}
+            className="absolute inset-0 bg-white rounded-3xl shadow-2xl p-6 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing"
+            style={{
+              transform: `translateX(${isDragging ? currentX - startX : 0}px) rotateZ(${isDragging ? (currentX - startX) * 0.05 : 0}deg)`,
+              opacity: isDragging ? 0.95 : 1,
+              transition: isDragging ? 'none' : 'all 600ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+          >
+            {dragDirection && (
+              <div className="absolute top-4 right-4 bg-emerald-500 text-white rounded-full p-2 animate-pulse">
+                <Check className="w-4 h-4" />
+              </div>
+            )}
+            <p className="text-2xl font-black text-gray-900 mb-2 text-center">Marking done</p>
+            <p className="text-sm text-gray-500 text-center">
+              Swipe this card to view attendance summary
+            </p>
           </div>
         )}
       </div>
@@ -233,37 +261,39 @@ export function AttendanceCardSlider({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-4 w-full justify-center px-4">
-        <button
-          onClick={() => handleButtonClick('absent')}
-          className="w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all transform hover:scale-110 active:scale-95"
-          title="Mark Absent"
-        >
-          <X className="w-6 h-6" />
-        </button>
-        <button
-          onClick={handleUndo}
-          disabled={currentIndex === 0}
-          className="w-14 h-14 rounded-full bg-gray-400 hover:bg-gray-500 disabled:bg-gray-300 disabled:cursor-not-allowed text-white flex items-center justify-center shadow-lg transition-all transform hover:scale-110 active:scale-95"
-          title="Undo Last Mark"
-        >
-          <Undo2 className="w-6 h-6" />
-        </button>
-        <button
-          onClick={() => handleButtonClick('late')}
-          className="w-14 h-14 rounded-full bg-amber-400 hover:bg-amber-500 text-white flex items-center justify-center shadow-lg transition-all transform hover:scale-110 active:scale-95"
-          title="Mark Late"
-        >
-          <Clock className="w-6 h-6" />
-        </button>
-        <button
-          onClick={() => handleButtonClick('present')}
-          className="w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shadow-lg transition-all transform hover:scale-110 active:scale-95"
-          title="Mark Present"
-        >
-          <Check className="w-6 h-6" />
-        </button>
-      </div>
+      {!isCompletionCard && (
+        <div className="flex gap-4 w-full justify-center px-4">
+          <button
+            onClick={() => handleButtonClick('absent')}
+            className="w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all transform hover:scale-110 active:scale-95"
+            title="Mark Absent"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <button
+            onClick={handleUndo}
+            disabled={currentIndex === 0}
+            className="w-14 h-14 rounded-full bg-gray-400 hover:bg-gray-500 disabled:bg-gray-300 disabled:cursor-not-allowed text-white flex items-center justify-center shadow-lg transition-all transform hover:scale-110 active:scale-95"
+            title="Undo Last Mark"
+          >
+            <Undo2 className="w-6 h-6" />
+          </button>
+          <button
+            onClick={() => handleButtonClick('late')}
+            className="w-14 h-14 rounded-full bg-amber-400 hover:bg-amber-500 text-white flex items-center justify-center shadow-lg transition-all transform hover:scale-110 active:scale-95"
+            title="Mark Late"
+          >
+            <Clock className="w-6 h-6" />
+          </button>
+          <button
+            onClick={() => handleButtonClick('present')}
+            className="w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shadow-lg transition-all transform hover:scale-110 active:scale-95"
+            title="Mark Present"
+          >
+            <Check className="w-6 h-6" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
