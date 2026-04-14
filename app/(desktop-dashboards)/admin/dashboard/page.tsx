@@ -25,9 +25,7 @@ export default async function AdminDashboard() {
   const formattedDate = `${new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(today)}, ${today.getDate()} ${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(today)}`;
 
   // 2. Fetch the Daily Snapshot
-  let snapshot = await prisma.systemDailySnapshot.findUnique({
-    where: { date: today },
-  });
+  let snapshot 
 
   // 3. Fallback: If cron hasn't run yet today, create a blank snapshot structure
   if (!snapshot) {
