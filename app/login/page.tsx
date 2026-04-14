@@ -50,7 +50,7 @@ export default function LoginPage() {
       const userRole = session?.user?.role?.toLowerCase() || "student"; // defaults to student just in case
 
       // Redirect to the role-based dashboard
-      router.push(`/${userRole}/dashboard`);
+      router.push(`/${userRole}`);
       router.refresh(); // Force a refresh so layout fetches the new session state
     }
   };
