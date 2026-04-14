@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import { mockStudents, AttendanceStatus } from '../data/mock-students';
 import { AttendanceCardSlider } from '../components/attendance-card-slider';
+import { AttendanceSummary } from '../components/attendance-summary';
 
 interface StudentAttendanceRecord {
   studentId: string;
@@ -17,6 +18,7 @@ interface StudentAttendanceRecord {
 
 export default function AttendancePage() {
   const [attendanceRecords, setAttendanceRecords] = useState<StudentAttendanceRecord[]>([]);
+  const [isSummaryVisible, setIsSummaryVisible] = useState(false);
 
   // Mock course data
   const courseData = {
@@ -44,6 +46,8 @@ export default function AttendancePage() {
   const absentees = attendanceRecords.filter((r) => r.status === 'absent');
   const absentCount = absentees.length;
   const presentCount = attendanceRecords.filter((r) => r.status === 'present').length;
+  const lateCount = attendanceRecords.filter((r) => r.status === 'late').length;
+  const effectivePresentCount = presentCount + lateCount;
   const absentRollNumbers = absentees.map((r) => {
     const student = mockStudents.find((s) => s.id === r.studentId);
     return student?.rollNumber;
@@ -81,7 +85,7 @@ export default function AttendancePage() {
               {absentRollNumbers.join(', ')}
             </p>
             <p className="text-xs text-red-500 mt-1">
-              {absentCount} Absent • {presentCount} Present
+              {absentCount} Absent • {effectivePresentCount} Present
             </p>
           </div>
         )}
@@ -106,19 +110,21 @@ export default function AttendancePage() {
         </div>
       </div>
 
-      {/* Attendance Card Slider */}
-      <AttendanceCardSlider students={mockStudents} onMarkAttendance={handleMarkAttendance} />
+      {!isSummaryVisible && (
+        <AttendanceCardSlider
+          students={mockStudents}
+          onMarkAttendance={handleMarkAttendance}
+          onConfirmSummary={() => setIsSummaryVisible(true)}
+        />
+      )}
 
-      {/* Completion Message */}
-      {attendanceRecords.length === mockStudents.length && (
-        <div className="mt-8 mx-4 p-6 bg-linear-to-br from-emerald-50 to-teal-50 border-2 border-emerald-300 rounded-3xl text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <p className="text-xl font-bold text-emerald-700 mb-2">
-            ✓ Call List Complete!
-          </p>
-          <p className="text-sm text-emerald-600">
-            All {mockStudents.length} students have been marked
-          </p>
-        </div>
+      {isSummaryVisible && (
+        <AttendanceSummary
+          totalCount={mockStudents.length}
+          effectivePresentCount={effectivePresentCount}
+          absentCount={absentCount}
+          lateCount={lateCount}
+        />
       )}
     </main>
   );
