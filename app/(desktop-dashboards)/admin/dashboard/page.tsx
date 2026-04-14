@@ -68,7 +68,7 @@ export default async function AdminDashboard() {
             aria-label="Settings"
           >
             {/* Qadir: Drop the Hexagon SVG here. (This span is just a temporary line) */}
-            <span className="block w-4 h-[1px] bg-gray-300 transform -rotate-45"></span>
+            <span className="block w-4 h-px bg-gray-300 transform -rotate-45"></span>
           </Link>
         </div>
         

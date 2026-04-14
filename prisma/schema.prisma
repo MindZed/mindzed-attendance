@@ -54,7 +54,7 @@ enum SessionType {
   TUTORIAL    // Default: 1 Point
 }
 
-// NEW: To handle Souvik Sir's edge cases
+// NEW: To handle edge cases
 enum CoverageType {
   FIRST_TIME  // Standard completion
   REVISION    // Taught again by student demand

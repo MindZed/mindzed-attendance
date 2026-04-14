@@ -5,7 +5,7 @@
 "use client";
 
 import { useState } from "react";
-import { updatePassword } from "@/lib/actions/user";
+import { updatePassword } from "@/lib/actions/admin/update-password";
 
 export default function SecurityPage() {
     const [currentPassword, setCurrentPassword] = useState("");
@@ -58,7 +58,7 @@ export default function SecurityPage() {
     return (
         <div className="max-w-md mx-auto mt-4 space-y-6">
             <div>
-                <h1 className="text-2xl font-bold tracking-tight text-gray-900">Security Settings</h1>
+                <h1 className="text-2xl font-bold tracking-tight text-gray-900">Admin Security Settings</h1>
                 <p className="text-sm text-gray-500 mt-1">Manage your password and account security.</p>
             </div>
 

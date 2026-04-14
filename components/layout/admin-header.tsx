@@ -68,13 +68,19 @@ export default function AdminHeader() {
                         >
                             Manage Users
                         </Link>
-                        {/* NEW SECURITY LINK */}
                         <Link
                             href="/admin/security"
                             onClick={() => setIsMenuOpen(false)}
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         >
-                            Security
+                            Update Password
+                        </Link>
+                        <Link
+                            href="/settings"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        >
+                            Settings
                         </Link>
                         <hr className="my-1 border-gray-100" />
                         <button
