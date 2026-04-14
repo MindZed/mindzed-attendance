@@ -1,3 +1,7 @@
+// app/(mobile-pwa)/teacher/components/bottom-navigation.tsx
+// This component is a bottom navigation bar for the teacher's mobile view. It includes links to the home page, schedule, and resources. The active link is highlighted based on the current pathname.
+// The navigation bar is fixed at the bottom of the screen and has a rounded, pill-shaped design with a shadow for better visibility. Each navigation item consists of an icon and a label, and the active item is styled differently to indicate the current page.
+
 'use client';
 
 import { Home, Calendar, BookOpen } from 'lucide-react';

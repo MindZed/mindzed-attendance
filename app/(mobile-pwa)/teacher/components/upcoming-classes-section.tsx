@@ -1,3 +1,7 @@
+// app/(mobile-pwa)/teacher/components/upcoming-classes-section.tsx
+// This component displays a list of upcoming classes for teachers in a mobile PWA format. It uses the UpcomingClassCard component to show individual class details. If there are no upcoming classes, it shows a message indicating that there are none.
+// The component is designed to be responsive and user-friendly, with clear headings and spacing for better readability on mobile devices.
+
 'use client';
 
 import { UpcomingClassCard } from './upcoming-class-card';

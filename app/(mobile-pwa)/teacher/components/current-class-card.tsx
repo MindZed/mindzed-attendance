@@ -1,3 +1,7 @@
+// app/(mobile-pwa)/teacher/components/current-class-card.tsx
+// This component displays the current class information for a teacher, including course details, time, room, and attendance percentage. It also includes a button to slide for attendance.
+// The component is designed to be used in a mobile PWA for teachers, providing a clear and concise overview of the current class and allowing for easy interaction to manage attendance.
+
 'use client';
 
 import { Users } from 'lucide-react';

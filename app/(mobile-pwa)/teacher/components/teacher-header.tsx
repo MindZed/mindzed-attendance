@@ -1,3 +1,7 @@
+// app/(mobile-pwa)/teacher/components/teacher-header.tsx
+// This component displays a greeting, the teacher's name, and the number of classes left for the day.
+// It is designed to be used in the teacher's dashboard of a mobile PWA.
+
 "use client";
 
 

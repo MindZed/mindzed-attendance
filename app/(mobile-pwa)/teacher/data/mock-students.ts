@@ -1,3 +1,7 @@
+// app/(mobile-pwa)/teacher/data/mock-students.ts
+// This file contains mock student data for testing and development purposes in the teacher dashboard of the mobile PWA version of the app.
+// Each student has an ID, roll number, name, email, course ID, current attendance percentage, and an optional status indicating their attendance for the current class.
+
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'previous';
 
 export interface Student {

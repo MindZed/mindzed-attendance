@@ -1,3 +1,7 @@
+// app/(mobile-pwa)/teacher/components/upcoming-class-card.tsx
+// This component represents a card for an upcoming class, displaying
+// the course name, start time, course code, year, and optionally the attendance percentage.
+
 'use client';
 
 interface UpcomingClassCardProps {

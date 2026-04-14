@@ -1,3 +1,8 @@
+// app/(mobile-pwa)/teacher/attendance/page.tsx
+// This is the main attendance page for teachers. It displays course information, allows marking attendance for each student, and shows a summary of absentees.
+// The page uses a slider component to show student cards, where teachers can mark each student as present or absent. It also calculates and displays the total number of absentees and their roll numbers.
+// The design is optimized for mobile devices, with a clean and intuitive interface. The header includes a close button to exit the attendance page, and the main content area focuses on the attendance marking process. Once all students have been marked, a completion message is displayed.
+
 'use client';
 
 import { useState } from 'react';

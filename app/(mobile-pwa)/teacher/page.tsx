@@ -1,3 +1,7 @@
+// app/(mobile-pwa)/teacher/page.tsx
+// This is the main dashboard page for teachers in the mobile PWA version of the app.
+// It includes a header, current class information, upcoming classes, and a bottom navigation bar.
+
 'use client';
 
 import { useState } from 'react';

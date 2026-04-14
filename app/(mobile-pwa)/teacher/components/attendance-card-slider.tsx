@@ -1,3 +1,7 @@
+// app/(mobile-pwa)/teacher/components/attendance-card-slider.tsx
+// This component implements a swipeable card interface for marking student attendance.
+// It allows teachers to swipe right to mark present, left to mark absent, and has buttons for marking late or undoing the last action.
+
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
