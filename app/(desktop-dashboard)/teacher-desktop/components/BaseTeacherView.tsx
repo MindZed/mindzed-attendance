@@ -65,8 +65,8 @@ export function BaseTeacherView() {
                         outerRadius={34}
                         strokeWidth={0}
                       >
-                        <Cell fill="#BDE0D9" />
-                        <Cell fill="#E6DFF1" />
+                        <Cell fill="var(--color-mz-success)" />
+                        <Cell fill="var(--color-mz-bg-secondary)" />
                       </Pie>
                     </PieChart>
                   </ResponsiveContainer>

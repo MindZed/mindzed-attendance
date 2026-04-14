@@ -29,8 +29,8 @@ export function DashboardLayout() {
       className={shellClassName}
       initial={false}
       animate={{
-        backgroundColor: isAdminView ? "#101010" : "#FFFFFF",
-        color: isAdminView ? "#F3EFFA" : "#101010",
+        backgroundColor: isAdminView ? "var(--color-mz-text-primary)" : "var(--color-mz-bg-primary)",
+        color: isAdminView ? "var(--color-mz-dark-text)" : "var(--color-mz-text-primary)",
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
