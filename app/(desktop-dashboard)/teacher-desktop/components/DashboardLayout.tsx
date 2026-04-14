@@ -56,7 +56,7 @@ export function DashboardLayout() {
               <button
                 type="button"
                 onClick={() => setIsAdminView((value) => !value)}
-                className="border border-mz-text-primary bg-mz-warning px-4 py-2 text-sm font-semibold text-mz-text-primary transition hover:opacity-90"
+                className="border border-[var(--color-mz-text-primary)] bg-[var(--color-mz-warning)] px-4 py-2 text-sm font-semibold text-[var(--color-mz-text-primary)] transition hover:opacity-90"
               >
                 {isAdminView ? "Switch to Teacher View" : "Switch to Admin View"}
               </button>
