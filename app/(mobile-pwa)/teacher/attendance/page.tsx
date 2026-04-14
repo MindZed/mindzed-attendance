@@ -121,7 +121,7 @@ export default function AttendancePage() {
       {isSummaryVisible && (
         <AttendanceSummary
           totalCount={mockStudents.length}
-          presentCount={effectivePresentCount}
+          effectivePresentCount={effectivePresentCount}
           absentCount={absentCount}
           lateCount={lateCount}
         />
