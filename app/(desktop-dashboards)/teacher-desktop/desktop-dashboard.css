@@ -1,0 +1,20 @@
+.dashboard-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #101010 #e6dff1;
+}
+
+.dashboard-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.dashboard-scroll::-webkit-scrollbar-track {
+  background: #e6dff1;
+}
+
+.dashboard-scroll::-webkit-scrollbar-thumb {
+  background: #101010;
+}
+
+.admin-theme {
+  color-scheme: dark;
+}
