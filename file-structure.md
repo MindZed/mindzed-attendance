@@ -1,14 +1,35 @@
 ```
-└── 📁attendace_pwa
+└── 📁attendace_pwa 
     └── 📁app
-        └── 📁admin
-            └── 📁dashboard
+        └── 📁(desktop-dashboards)
+            └── 📁admin
+                └── 📁classes
+                    ├── page.tsx
+                └── 📁dashboard
+                    ├── page.tsx
+                └── 📁security
+                    ├── page.tsx
+                └── 📁users
+                    ├── page.tsx
+                ├── layout.tsx
                 ├── page.tsx
-            └── 📁security
+            └── 📁teacher-desktop
+        └── 📁(mobile-pwa)
+            └── 📁student
+            └── 📁teacher
+                └── 📁attendance
+                    ├── page.tsx
+                └── 📁components
+                    ├── attendance-card-slider.tsx
+                    ├── attendance-summary.tsx
+                    ├── bottom-navigation.tsx
+                    ├── current-class-card.tsx
+                    ├── teacher-header.tsx
+                    ├── upcoming-class-card.tsx
+                    ├── upcoming-classes-section.tsx
+                └── 📁data
+                    ├── mock-students.ts
                 ├── page.tsx
-            └── 📁settings
-            ├── layout.tsx
-            ├── page.tsx
         └── 📁api
             └── 📁auth
                 └── 📁[...nextauth]
@@ -19,7 +40,7 @@
             └── 📁security
                 ├── page.tsx
             ├── page.tsx
-        └── 📁users
+        └── 📁view-users
             └── 📁admins
                 ├── page.tsx
             └── 📁students
@@ -38,9 +59,14 @@
             ├── session-provider.tsx
     └── 📁lib
         └── 📁actions
+            └── 📁admin
+                ├── classes.ts
+                ├── crud.ts
+                ├── update-password.ts
+            └── 📁student
+            └── 📁teacher
             ├── auth.ts
             ├── security.ts
-            ├── user.ts
             ├── users.ts
         ├── prisma.ts
     └── 📁prisma
